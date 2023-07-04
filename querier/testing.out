@@ -1,0 +1,368 @@
+# Testing file for querier
+#
+# Jasper Tucker, May 2023
+
+# file assumes that common, querier, and fuzzquery have been built
+
+mkdir ../data
+mkdir ../data/fakedir
+mkdir ../data/fakeIndex
+chmod 000 ../data/fakeIndex
+
+# too few arguments
+./querier 
+No arguments were given - pass a page directory where the crawler stored files and a file to write the index to
+
+# too many arguments
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index ~/cs50-dev/shared/tse/output/toscrape-2
+Too many arguments were given - pass a page directory where the crawler stored files and a file to write the index to
+
+# invalid page directory
+./querier ~/cs50-dev/shared/tse/output/toscrape-9 ~/cs50-dev/shared/tse/output/toscrape-2.index
+page directory passed (first arg) is not a valid, crawler produced, directory
+
+# non-crawler produced page directory
+./querier ../data/fakedir ~/cs50-dev/shared/tse/output/toscrape-2.index
+page directory passed (first arg) is not a valid, crawler produced, directory
+
+# non-readable index file
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ../data/fakeIndex
+file to get index from (second arg) is not a valid file with read permissions
+
+# normal arguments, query with numbers
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/qnumbers.txt
+Numbers or special characters are not allowed
+
+# normal arguments, query with special characters
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/qspecialchars.txt
+Numbers or special characters are not allowed
+
+# normal arguments, query with no matches
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/qnomatches.txt
+Clean Query: thisisareallylongword 
+No documents match.
+
+# normal arguments, query with one word
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/q1word.txt
+Clean Query: alabama 
+Score: 1, Doc ID: 264, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/until-friday-night-the-field-party-1_775/index.html
+
+# normal arguments, query using 'and'
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/qand.txt
+Clean Query: for and too and boy 
+Score: 1, Doc ID: 37, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-coming-woman-a-novel-based-on-the-life-of-the-infamous-feminist-victoria-woodhull_993/index.html
+Score: 1, Doc ID: 434, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/finders-keepers-bill-hodges-trilogy-2_807/index.html
+
+# normal arguments, query with two words, 'and' is implied
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/qimpliedand.txt
+Clean Query: books and many pages 
+Score: 1, Doc ID: 16, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/worlds-elsewhere-journeys-around-shakespeares-globe_972/index.html
+Score: 1, Doc ID: 111, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-art-of-startup-fundraising_606/index.html
+Score: 1, Doc ID: 323, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-mindfulness-and-acceptance-workbook-for-anxiety-a-guide-to-breaking-free-from-anxiety-phobias-and-worry-using-acceptance-and-commitment-therapy_937/index.html
+
+# normal arguments, query using 'or'
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/qor.txt
+Clean Query: computers or computer 
+Score: 9, Doc ID: 380, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/algorithms-to-live-by-the-computer-science-of-human-decisions_880/index.html
+Score: 2, Doc ID: 166, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-stand_282/index.html
+
+# normal arguments, query with a longer statement, mix of 'and' and 'or'
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/qandor.txt
+Clean Query: for and computer science or cars and this 
+Score: 3, Doc ID: 161, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-age-of-genius-the-seventeenth-century-and-the-birth-of-the-modern-mind_929/index.html
+Score: 3, Doc ID: 368, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/this-is-your-brain-on-music-the-science-of-a-human-obsession_414/index.html
+Score: 2, Doc ID: 3, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/page-3.html
+Score: 2, Doc ID: 105, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/business_35/index.html
+Score: 2, Doc ID: 156, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/1491-new-revelations-of-the-americas-before-columbus_650/index.html
+Score: 2, Doc ID: 203, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/lab-girl_595/index.html
+Score: 2, Doc ID: 221, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/feathers-displays-of-brilliant-plumage_695/index.html
+Score: 2, Doc ID: 224, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/poetry_23/index.html
+Score: 2, Doc ID: 246, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-grand-design_405/index.html
+Score: 2, Doc ID: 248, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/diary-of-a-citizen-scientist-chasing-tiger-beetles-and-other-new-ways-of-engaging-the-world_517/index.html
+Score: 2, Doc ID: 252, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/immunity-how-elie-metchnikoff-changed-the-course-of-modern-medicine_900/index.html
+Score: 2, Doc ID: 254, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/young-adult_21/index.html
+Score: 2, Doc ID: 318, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/modern-romance_820/index.html
+Score: 2, Doc ID: 343, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/soft-apocalypse_833/index.html
+Score: 2, Doc ID: 362, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/music_14/index.html
+Score: 2, Doc ID: 460, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/romance_8/index.html
+Score: 2, Doc ID: 461, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/romance_8/page-2.html
+Score: 2, Doc ID: 511, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/sequential-art_5/index.html
+Score: 2, Doc ID: 524, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/patience_916/index.html
+Score: 1, Doc ID: 1, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/index.html
+Score: 1, Doc ID: 2, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/page-2.html
+Score: 1, Doc ID: 4, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/page-1.html
+Score: 1, Doc ID: 22, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/foolproof-preserving-a-guide-to-small-batch-jams-jellies-pickles-condiments-and-more-a-foolproof-guide-to-making-small-batch-jams-jellies-pickles-condiments-and-more_978/index.html
+Score: 1, Doc ID: 25, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/its-only-the-himalayas_981/index.html
+Score: 1, Doc ID: 26, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/libertarianism-for-beginners_982/index.html
+Score: 1, Doc ID: 27, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/mesaerion-the-best-science-fiction-stories-1800-1849_983/index.html
+Score: 1, Doc ID: 40, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/sapiens-a-brief-history-of-humankind_996/index.html
+Score: 1, Doc ID: 45, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/crime_51/index.html
+Score: 1, Doc ID: 46, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-long-shadow-of-small-ghosts-murder-and-memory-in-an-american-city_848/index.html
+Score: 1, Doc ID: 47, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/erotica_50/index.html
+Score: 1, Doc ID: 48, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/dark-notes_800/index.html
+Score: 1, Doc ID: 49, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/cultural_49/index.html
+Score: 1, Doc ID: 50, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/amid-the-chaos_788/index.html
+Score: 1, Doc ID: 51, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/politics_48/index.html
+Score: 1, Doc ID: 52, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/equal-is-unfair-americas-misguided-fight-against-income-inequality_617/index.html
+Score: 1, Doc ID: 53, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/why-the-right-went-wrong-conservatism-from-goldwater-to-the-tea-party-and-beyond_781/index.html
+Score: 1, Doc ID: 54, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/health_47/index.html
+Score: 1, Doc ID: 55, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-art-and-science-of-low-carbohydrate-living_570/index.html
+Score: 1, Doc ID: 59, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/novels_46/index.html
+Score: 1, Doc ID: 61, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/short-stories_45/index.html
+Score: 1, Doc ID: 63, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/suspense_44/index.html
+Score: 1, Doc ID: 65, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/christian_43/index.html
+Score: 1, Doc ID: 69, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/historical_42/index.html
+Score: 1, Doc ID: 72, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/self-help_41/index.html
+Score: 1, Doc ID: 78, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/academic_40/index.html
+Score: 1, Doc ID: 80, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/spirituality_39/index.html
+Score: 1, Doc ID: 86, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/contemporary_38/index.html
+Score: 1, Doc ID: 90, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/thriller_37/index.html
+Score: 1, Doc ID: 99, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/biography_36/index.html
+Score: 1, Doc ID: 111, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-art-of-startup-fundraising_606/index.html
+Score: 1, Doc ID: 117, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/christian-fiction_34/index.html
+Score: 1, Doc ID: 124, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/food-and-drink_33/index.html
+Score: 1, Doc ID: 125, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/food-and-drink_33/page-2.html
+Score: 1, Doc ID: 140, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-nerdy-nummies-cookbook-sweet-treats-for-the-geek-in-all-of-us_853/index.html
+Score: 1, Doc ID: 145, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/history_32/index.html
+Score: 1, Doc ID: 146, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/house-of-lost-worlds-dinosaurs-dynasties-and-the-story-of-life-on-earth_170/index.html
+Score: 1, Doc ID: 148, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/americas-war-for-the-greater-middle-east-a-military-history_361/index.html
+Score: 1, Doc ID: 153, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/a-short-history-of-nearly-everything_457/index.html
+Score: 1, Doc ID: 163, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/horror_31/index.html
+Score: 1, Doc ID: 181, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/humor_30/index.html
+Score: 1, Doc ID: 192, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/adult-fiction_29/index.html
+Score: 1, Doc ID: 194, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/parenting_28/index.html
+Score: 1, Doc ID: 196, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/autobiography_27/index.html
+Score: 1, Doc ID: 206, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/psychology_26/index.html
+Score: 1, Doc ID: 214, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/art_25/index.html
+Score: 1, Doc ID: 222, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/paranormal_24/index.html
+Score: 1, Doc ID: 239, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/science_22/index.html
+Score: 1, Doc ID: 240, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-selfish-gene_81/index.html
+Score: 1, Doc ID: 241, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/seven-brief-lessons-on-physics_219/index.html
+Score: 1, Doc ID: 242, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/surely-youre-joking-mr-feynman-adventures-of-a-curious-character_227/index.html
+Score: 1, Doc ID: 243, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-disappearing-spoon-and-other-true-tales-of-madness-love-and-the-history-of-the-world-from-the-periodic-table-of-the-elements_244/index.html
+Score: 1, Doc ID: 244, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-elegant-universe-superstrings-hidden-dimensions-and-the-quest-for-the-ultimate-theory_245/index.html
+Score: 1, Doc ID: 245, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/peak-secrets-from-the-new-science-of-expertise_389/index.html
+Score: 1, Doc ID: 247, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-origin-of-species_499/index.html
+Score: 1, Doc ID: 249, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-fabric-of-the-cosmos-space-time-and-the-texture-of-reality_572/index.html
+Score: 1, Doc ID: 250, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/tipping-point-for-planet-earth-how-close-are-we-to-the-edge_643/index.html
+Score: 1, Doc ID: 251, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/sorting-the-beef-from-the-bull-the-science-of-food-fraud-forensics_736/index.html
+Score: 1, Doc ID: 253, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-most-perfect-thing-inside-and-outside-a-birds-egg_938/index.html
+Score: 1, Doc ID: 255, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/young-adult_21/page-2.html
+Score: 1, Doc ID: 274, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/new-adult_20/index.html
+Score: 1, Doc ID: 281, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/fantasy_19/index.html
+Score: 1, Doc ID: 282, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/fantasy_19/page-2.html
+Score: 1, Doc ID: 303, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/add-a-comment_18/index.html
+Score: 1, Doc ID: 304, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/add-a-comment_18/page-2.html
+Score: 1, Doc ID: 309, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/a-series-of-catastrophes-and-miracles-a-true-story-of-love-science-and-cancer_655/index.html
+Score: 1, Doc ID: 325, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/sports-and-games_17/index.html
+Score: 1, Doc ID: 331, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/science-fiction_16/index.html
+Score: 1, Doc ID: 332, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/having-the-barbarians-baby-ice-planet-barbarians-75_23/index.html
+Score: 1, Doc ID: 333, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-last-girl-the-dominion-trilogy-1_70/index.html
+Score: 1, Doc ID: 334, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/three-wishes-river-of-time-california-1_89/index.html
+Score: 1, Doc ID: 335, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/do-androids-dream-of-electric-sheep-blade-runner-1_149/index.html
+Score: 1, Doc ID: 336, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/dune-dune-1_151/index.html
+Score: 1, Doc ID: 337, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/life-the-universe-and-everything-hitchhikers-guide-to-the-galaxy-3_189/index.html
+Score: 1, Doc ID: 338, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/ready-player-one_209/index.html
+Score: 1, Doc ID: 339, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-restaurant-at-the-end-of-the-universe-hitchhikers-guide-to-the-galaxy-2_275/index.html
+Score: 1, Doc ID: 340, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/foundation-foundation-publication-order-1_375/index.html
+Score: 1, Doc ID: 341, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/arena_587/index.html
+Score: 1, Doc ID: 342, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/sleeping-giants-themis-files-1_604/index.html
+Score: 1, Doc ID: 344, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-project_856/index.html
+Score: 1, Doc ID: 345, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/william-shakespeares-star-wars-verily-a-new-hope-william-shakespeares-star-wars-4_871/index.html
+Score: 1, Doc ID: 346, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/join_902/index.html
+Score: 1, Doc ID: 347, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/default_15/index.html
+Score: 1, Doc ID: 348, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/default_15/page-2.html
+Score: 1, Doc ID: 349, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-bridge-to-consciousness-im-writing-the-bridge-between-science-and-our-old-and-new-beliefs_840/index.html
+Score: 1, Doc ID: 373, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/nonfiction_13/index.html
+Score: 1, Doc ID: 374, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/nonfiction_13/page-2.html
+Score: 1, Doc ID: 377, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-genius-of-birds_843/index.html
+Score: 1, Doc ID: 378, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-omnivores-dilemma-a-natural-history-of-four-meals_854/index.html
+Score: 1, Doc ID: 380, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/algorithms-to-live-by-the-computer-science-of-human-decisions_880/index.html
+Score: 1, Doc ID: 386, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-electric-pencil-drawings-from-inside-state-hospital-no-3_933/index.html
+Score: 1, Doc ID: 393, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/religion_12/index.html
+Score: 1, Doc ID: 400, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/dont-be-a-jerk-and-other-practical-advice-from-dogen-japans-greatest-zen-master_890/index.html
+Score: 1, Doc ID: 401, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/childrens_11/index.html
+Score: 1, Doc ID: 402, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/childrens_11/page-2.html
+Score: 1, Doc ID: 421, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/fiction_10/index.html
+Score: 1, Doc ID: 422, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/fiction_10/page-2.html
+Score: 1, Doc ID: 442, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/womens-fiction_9/index.html
+Score: 1, Doc ID: 480, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/philosophy_7/index.html
+Score: 1, Doc ID: 491, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/classics_6/index.html
+Score: 1, Doc ID: 512, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/sequential-art_5/page-2.html
+Score: 1, Doc ID: 532, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/historical-fiction_4/index.html
+Score: 1, Doc ID: 533, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/historical-fiction_4/page-2.html
+Score: 1, Doc ID: 553, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/mystery_3/index.html
+Score: 1, Doc ID: 554, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/mystery_3/page-2.html
+Score: 1, Doc ID: 573, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/travel_2/index.html
+Score: 1, Doc ID: 580, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/under-the-tuscan-sun_504/index.html
+Score: 1, Doc ID: 581, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/vagabonding-an-uncommon-guide-to-the-art-of-long-term-world-travel_552/index.html
+Score: 1, Doc ID: 582, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/see-america-a-celebration-of-our-national-parks-treasured-sites_732/index.html
+Score: 1, Doc ID: 583, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/full-moon-over-noahs-ark-an-odyssey-to-mount-ararat-and-beyond_811/index.html
+Score: 1, Doc ID: 584, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books_1/index.html
+Score: 1, Doc ID: 585, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books_1/page-2.html
+
+# normal arguments, query with a longer statement and capitalization
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/qandorcaps.txt
+Clean Query: ribbed boyfriends or herself and examinaton 
+No documents match.
+
+# normal arguments, query includes misspelled words
+./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/qmisspelled.txt
+Clean Query: oops i spelt this wurd wroong 
+No documents match.
+
+# normal arguments, piped from fuzzquery
+./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index 10 0 | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
+./fuzzquery: generating 10 queries from 13563 words
+Clean Query: inthe and quarters hangs or visited kahneman or beneath shopping nationally holery or predicts endlessly axell conduct or christine or curdled or sorbonne endowment or cosmic lover sketchbook and priest or bfed orientation iceland describe worse or defeating clerks arnold streusel or braved multiplatform patience or nightstruck or bowerbird and antoinette and stances 
+No documents match.
+
+# normal arguments, run with valgrind
+valgrind --leak-check=full --show-leak-kinds=all ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index < testingfiles/qandor.txt
+==2269378== Memcheck, a memory error detector
+==2269378== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==2269378== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==2269378== Command: ./querier /thayerfs/home/f006hb9/cs50-dev/shared/tse/output/toscrape-2 /thayerfs/home/f006hb9/cs50-dev/shared/tse/output/toscrape-2.index
+==2269378== 
+Clean Query: for and computer science or cars and this 
+Score: 3, Doc ID: 161, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-age-of-genius-the-seventeenth-century-and-the-birth-of-the-modern-mind_929/index.html
+Score: 3, Doc ID: 368, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/this-is-your-brain-on-music-the-science-of-a-human-obsession_414/index.html
+Score: 2, Doc ID: 3, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/page-3.html
+Score: 2, Doc ID: 105, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/business_35/index.html
+Score: 2, Doc ID: 156, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/1491-new-revelations-of-the-americas-before-columbus_650/index.html
+Score: 2, Doc ID: 203, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/lab-girl_595/index.html
+Score: 2, Doc ID: 221, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/feathers-displays-of-brilliant-plumage_695/index.html
+Score: 2, Doc ID: 224, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/poetry_23/index.html
+Score: 2, Doc ID: 246, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-grand-design_405/index.html
+Score: 2, Doc ID: 248, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/diary-of-a-citizen-scientist-chasing-tiger-beetles-and-other-new-ways-of-engaging-the-world_517/index.html
+Score: 2, Doc ID: 252, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/immunity-how-elie-metchnikoff-changed-the-course-of-modern-medicine_900/index.html
+Score: 2, Doc ID: 254, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/young-adult_21/index.html
+Score: 2, Doc ID: 318, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/modern-romance_820/index.html
+Score: 2, Doc ID: 343, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/soft-apocalypse_833/index.html
+Score: 2, Doc ID: 362, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/music_14/index.html
+Score: 2, Doc ID: 460, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/romance_8/index.html
+Score: 2, Doc ID: 461, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/romance_8/page-2.html
+Score: 2, Doc ID: 511, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/sequential-art_5/index.html
+Score: 2, Doc ID: 524, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/patience_916/index.html
+Score: 1, Doc ID: 1, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/index.html
+Score: 1, Doc ID: 2, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/page-2.html
+Score: 1, Doc ID: 4, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/page-1.html
+Score: 1, Doc ID: 22, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/foolproof-preserving-a-guide-to-small-batch-jams-jellies-pickles-condiments-and-more-a-foolproof-guide-to-making-small-batch-jams-jellies-pickles-condiments-and-more_978/index.html
+Score: 1, Doc ID: 25, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/its-only-the-himalayas_981/index.html
+Score: 1, Doc ID: 26, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/libertarianism-for-beginners_982/index.html
+Score: 1, Doc ID: 27, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/mesaerion-the-best-science-fiction-stories-1800-1849_983/index.html
+Score: 1, Doc ID: 40, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/sapiens-a-brief-history-of-humankind_996/index.html
+Score: 1, Doc ID: 45, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/crime_51/index.html
+Score: 1, Doc ID: 46, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-long-shadow-of-small-ghosts-murder-and-memory-in-an-american-city_848/index.html
+Score: 1, Doc ID: 47, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/erotica_50/index.html
+Score: 1, Doc ID: 48, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/dark-notes_800/index.html
+Score: 1, Doc ID: 49, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/cultural_49/index.html
+Score: 1, Doc ID: 50, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/amid-the-chaos_788/index.html
+Score: 1, Doc ID: 51, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/politics_48/index.html
+Score: 1, Doc ID: 52, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/equal-is-unfair-americas-misguided-fight-against-income-inequality_617/index.html
+Score: 1, Doc ID: 53, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/why-the-right-went-wrong-conservatism-from-goldwater-to-the-tea-party-and-beyond_781/index.html
+Score: 1, Doc ID: 54, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/health_47/index.html
+Score: 1, Doc ID: 55, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-art-and-science-of-low-carbohydrate-living_570/index.html
+Score: 1, Doc ID: 59, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/novels_46/index.html
+Score: 1, Doc ID: 61, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/short-stories_45/index.html
+Score: 1, Doc ID: 63, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/suspense_44/index.html
+Score: 1, Doc ID: 65, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/christian_43/index.html
+Score: 1, Doc ID: 69, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/historical_42/index.html
+Score: 1, Doc ID: 72, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/self-help_41/index.html
+Score: 1, Doc ID: 78, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/academic_40/index.html
+Score: 1, Doc ID: 80, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/spirituality_39/index.html
+Score: 1, Doc ID: 86, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/contemporary_38/index.html
+Score: 1, Doc ID: 90, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/thriller_37/index.html
+Score: 1, Doc ID: 99, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/biography_36/index.html
+Score: 1, Doc ID: 111, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-art-of-startup-fundraising_606/index.html
+Score: 1, Doc ID: 117, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/christian-fiction_34/index.html
+Score: 1, Doc ID: 124, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/food-and-drink_33/index.html
+Score: 1, Doc ID: 125, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/food-and-drink_33/page-2.html
+Score: 1, Doc ID: 140, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-nerdy-nummies-cookbook-sweet-treats-for-the-geek-in-all-of-us_853/index.html
+Score: 1, Doc ID: 145, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/history_32/index.html
+Score: 1, Doc ID: 146, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/house-of-lost-worlds-dinosaurs-dynasties-and-the-story-of-life-on-earth_170/index.html
+Score: 1, Doc ID: 148, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/americas-war-for-the-greater-middle-east-a-military-history_361/index.html
+Score: 1, Doc ID: 153, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/a-short-history-of-nearly-everything_457/index.html
+Score: 1, Doc ID: 163, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/horror_31/index.html
+Score: 1, Doc ID: 181, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/humor_30/index.html
+Score: 1, Doc ID: 192, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/adult-fiction_29/index.html
+Score: 1, Doc ID: 194, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/parenting_28/index.html
+Score: 1, Doc ID: 196, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/autobiography_27/index.html
+Score: 1, Doc ID: 206, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/psychology_26/index.html
+Score: 1, Doc ID: 214, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/art_25/index.html
+Score: 1, Doc ID: 222, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/paranormal_24/index.html
+Score: 1, Doc ID: 239, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/science_22/index.html
+Score: 1, Doc ID: 240, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-selfish-gene_81/index.html
+Score: 1, Doc ID: 241, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/seven-brief-lessons-on-physics_219/index.html
+Score: 1, Doc ID: 242, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/surely-youre-joking-mr-feynman-adventures-of-a-curious-character_227/index.html
+Score: 1, Doc ID: 243, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-disappearing-spoon-and-other-true-tales-of-madness-love-and-the-history-of-the-world-from-the-periodic-table-of-the-elements_244/index.html
+Score: 1, Doc ID: 244, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-elegant-universe-superstrings-hidden-dimensions-and-the-quest-for-the-ultimate-theory_245/index.html
+Score: 1, Doc ID: 245, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/peak-secrets-from-the-new-science-of-expertise_389/index.html
+Score: 1, Doc ID: 247, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-origin-of-species_499/index.html
+Score: 1, Doc ID: 249, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-fabric-of-the-cosmos-space-time-and-the-texture-of-reality_572/index.html
+Score: 1, Doc ID: 250, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/tipping-point-for-planet-earth-how-close-are-we-to-the-edge_643/index.html
+Score: 1, Doc ID: 251, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/sorting-the-beef-from-the-bull-the-science-of-food-fraud-forensics_736/index.html
+Score: 1, Doc ID: 253, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-most-perfect-thing-inside-and-outside-a-birds-egg_938/index.html
+Score: 1, Doc ID: 255, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/young-adult_21/page-2.html
+Score: 1, Doc ID: 274, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/new-adult_20/index.html
+Score: 1, Doc ID: 281, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/fantasy_19/index.html
+Score: 1, Doc ID: 282, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/fantasy_19/page-2.html
+Score: 1, Doc ID: 303, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/add-a-comment_18/index.html
+Score: 1, Doc ID: 304, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/add-a-comment_18/page-2.html
+Score: 1, Doc ID: 309, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/a-series-of-catastrophes-and-miracles-a-true-story-of-love-science-and-cancer_655/index.html
+Score: 1, Doc ID: 325, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/sports-and-games_17/index.html
+Score: 1, Doc ID: 331, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/science-fiction_16/index.html
+Score: 1, Doc ID: 332, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/having-the-barbarians-baby-ice-planet-barbarians-75_23/index.html
+Score: 1, Doc ID: 333, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-last-girl-the-dominion-trilogy-1_70/index.html
+Score: 1, Doc ID: 334, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/three-wishes-river-of-time-california-1_89/index.html
+Score: 1, Doc ID: 335, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/do-androids-dream-of-electric-sheep-blade-runner-1_149/index.html
+Score: 1, Doc ID: 336, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/dune-dune-1_151/index.html
+Score: 1, Doc ID: 337, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/life-the-universe-and-everything-hitchhikers-guide-to-the-galaxy-3_189/index.html
+Score: 1, Doc ID: 338, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/ready-player-one_209/index.html
+Score: 1, Doc ID: 339, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-restaurant-at-the-end-of-the-universe-hitchhikers-guide-to-the-galaxy-2_275/index.html
+Score: 1, Doc ID: 340, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/foundation-foundation-publication-order-1_375/index.html
+Score: 1, Doc ID: 341, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/arena_587/index.html
+Score: 1, Doc ID: 342, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/sleeping-giants-themis-files-1_604/index.html
+Score: 1, Doc ID: 344, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-project_856/index.html
+Score: 1, Doc ID: 345, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/william-shakespeares-star-wars-verily-a-new-hope-william-shakespeares-star-wars-4_871/index.html
+Score: 1, Doc ID: 346, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/join_902/index.html
+Score: 1, Doc ID: 347, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/default_15/index.html
+Score: 1, Doc ID: 348, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/default_15/page-2.html
+Score: 1, Doc ID: 349, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-bridge-to-consciousness-im-writing-the-bridge-between-science-and-our-old-and-new-beliefs_840/index.html
+Score: 1, Doc ID: 373, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/nonfiction_13/index.html
+Score: 1, Doc ID: 374, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/nonfiction_13/page-2.html
+Score: 1, Doc ID: 377, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-genius-of-birds_843/index.html
+Score: 1, Doc ID: 378, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-omnivores-dilemma-a-natural-history-of-four-meals_854/index.html
+Score: 1, Doc ID: 380, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/algorithms-to-live-by-the-computer-science-of-human-decisions_880/index.html
+Score: 1, Doc ID: 386, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-electric-pencil-drawings-from-inside-state-hospital-no-3_933/index.html
+Score: 1, Doc ID: 393, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/religion_12/index.html
+Score: 1, Doc ID: 400, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/dont-be-a-jerk-and-other-practical-advice-from-dogen-japans-greatest-zen-master_890/index.html
+Score: 1, Doc ID: 401, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/childrens_11/index.html
+Score: 1, Doc ID: 402, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/childrens_11/page-2.html
+Score: 1, Doc ID: 421, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/fiction_10/index.html
+Score: 1, Doc ID: 422, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/fiction_10/page-2.html
+Score: 1, Doc ID: 442, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/womens-fiction_9/index.html
+Score: 1, Doc ID: 480, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/philosophy_7/index.html
+Score: 1, Doc ID: 491, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/classics_6/index.html
+Score: 1, Doc ID: 512, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/sequential-art_5/page-2.html
+Score: 1, Doc ID: 532, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/historical-fiction_4/index.html
+Score: 1, Doc ID: 533, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/historical-fiction_4/page-2.html
+Score: 1, Doc ID: 553, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/mystery_3/index.html
+Score: 1, Doc ID: 554, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/mystery_3/page-2.html
+Score: 1, Doc ID: 573, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/travel_2/index.html
+Score: 1, Doc ID: 580, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/under-the-tuscan-sun_504/index.html
+Score: 1, Doc ID: 581, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/vagabonding-an-uncommon-guide-to-the-art-of-long-term-world-travel_552/index.html
+Score: 1, Doc ID: 582, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/see-america-a-celebration-of-our-national-parks-treasured-sites_732/index.html
+Score: 1, Doc ID: 583, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/full-moon-over-noahs-ark-an-odyssey-to-mount-ararat-and-beyond_811/index.html
+Score: 1, Doc ID: 584, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books_1/index.html
+Score: 1, Doc ID: 585, URL: http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books_1/page-2.html
+==2269378== 
+==2269378== HEAP SUMMARY:
+==2269378==     in use at exit: 0 bytes in 0 blocks
+==2269378==   total heap usage: 4,048,376 allocs, 4,048,376 frees, 68,500,497,213 bytes allocated
+==2269378== 
+==2269378== All heap blocks were freed -- no leaks are possible
+==2269378== 
+==2269378== For lists of detected and suppressed errors, rerun with: -s
+==2269378== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+

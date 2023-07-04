@@ -1,0 +1,132 @@
+# Testing file for indexer
+#
+# Jasper Tucker, May 2023
+
+# file assumes that common and indexer have been built
+
+mkdir ../data
+mkdir ../data/fakeOutput
+
+touch ../data/index
+chmod +w ../data/index
+touch ../data/fakeIndex
+chmod 000 ../data/fakeIndex
+touch ../data/secondIndex
+chmod +w ../data/secondIndex
+touch ../data/fakeSecondIndex
+chmod 000 ../data/fakeSecondIndex
+
+# too few arguments
+./indexer
+No arguments were given - pass a page directory where the crawler stored files and a file to write the index to
+
+# too many arguments 
+./indexer ~/cs50-dev/shared/tse/crawldata/toscrape-1 ../data/index ../data
+Too many arguments were given - pass a page directory where the crawler stored files and a file to write the index to
+
+# invalid page directory
+./indexer ../data/myOutput ../data/index
+page directory passed (first arg) is not a valid, crawler produced, directory
+
+# non-crawler page directory
+./indexer ../data/fakeOutput ../data/index
+page directory passed (first arg) is not a valid, crawler produced, directory
+
+# non-existent index file, indexer creates one
+./indexer ~/cs50-dev/shared/tse/crawldata/toscrape-1 ../data/myIndex
+arguments checked
+building index
+writing index to file
+finished
+
+# non-writable index file
+./indexer ~/cs50-dev/shared/tse/crawldata/toscrape-1 ../data/fakeIndex
+file to save index to (second arg) is not a valid file with write permissions
+
+# indexer as normal, with indextest
+./indexer ~/cs50-dev/shared/tse/crawldata/toscrape-1 ../data/index
+arguments checked
+building index
+writing index to file
+finished
+./indextest ../data/index ../data/secondIndex
+writing index to file
+done copying index
+~/cs50-dev/shared/tse/indexcmp ../data/index ../data/secondIndex
+
+# indexer as normal, with valgrind and indextest (also with valgrind)
+valgrind --leak-check=full --show-leak-kinds=all ./indexer ~/cs50-dev/shared/tse/crawldata/toscrape-1 ../data/index
+==2528845== Memcheck, a memory error detector
+==2528845== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==2528845== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==2528845== Command: ./indexer /thayerfs/home/f006hb9/cs50-dev/shared/tse/crawldata/toscrape-1 ../data/index
+==2528845== 
+arguments checked
+building index
+writing index to file
+finished
+==2528845== 
+==2528845== HEAP SUMMARY:
+==2528845==     in use at exit: 0 bytes in 0 blocks
+==2528845==   total heap usage: 2,335,765 allocs, 2,335,765 frees, 42,744,170,891 bytes allocated
+==2528845== 
+==2528845== All heap blocks were freed -- no leaks are possible
+==2528845== 
+==2528845== For lists of detected and suppressed errors, rerun with: -s
+==2528845== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+valgrind --leak-check=full --show-leak-kinds=all ./indextest ../data/index ../data/secondIndex
+==2528921== Memcheck, a memory error detector
+==2528921== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==2528921== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==2528921== Command: ./indextest ../data/index ../data/secondIndex
+==2528921== 
+writing index to file
+done copying index
+==2528921== 
+==2528921== HEAP SUMMARY:
+==2528921==     in use at exit: 0 bytes in 0 blocks
+==2528921==   total heap usage: 19,356 allocs, 19,356 frees, 467,706 bytes allocated
+==2528921== 
+==2528921== All heap blocks were freed -- no leaks are possible
+==2528921== 
+==2528921== For lists of detected and suppressed errors, rerun with: -s
+==2528921== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+~/cs50-dev/shared/tse/indexcmp ../data/index ../data/secondIndex
+
+# non-readable index file for indextest
+./indexer ~/cs50-dev/shared/tse/crawldata/toscrape-1 ../data/index
+arguments checked
+building index
+writing index to file
+finished
+./indextest ../data/fakeIndex ../data/secondIndex
+file to read index from (first arg) is not a valid file with read permissions
+
+# non-writable index file for indextest
+./indexer ~/cs50-dev/shared/tse/crawldata/toscrape-1 ../data/index
+arguments checked
+building index
+writing index to file
+finished
+./indextest ../data/index ../data/fakeSecondIndex
+file to write new index to (second arg) is not a valid file with write permissions
+
+# too few arguments for indextest
+./indexer ~/cs50-dev/shared/tse/crawldata/toscrape-1 ../data/index
+arguments checked
+building index
+writing index to file
+finished
+./indextest
+No arguments were given - pass an index file created by the indexer and a new file to write a copy of it to
+
+# too many arguments for indextest
+./indexer ~/cs50-dev/shared/tse/crawldata/toscrape-1 ../data/index
+arguments checked
+building index
+writing index to file
+finished
+./indextest ../data/fakeIndex ../data/secondIndex ../data
+Too many arguments were given - pass an index file created by the indexer and a new file to write a copy of it to
+
+# -- end --

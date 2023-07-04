@@ -1,0 +1,75 @@
+# Testing file for crawler
+#
+# Jasper Tucker, April 2023
+
+mkdir ../data/letters
+mkdir: cannot create directory '../data/letters': File exists
+mkdir ../data/scrape
+mkdir: cannot create directory '../data/scrape': File exists
+mkdir ../data/wiki
+mkdir: cannot create directory '../data/wiki': File exists
+
+# too few arguments
+./crawler
+No arguments were given - pass a URL to begin with, a directory to save pages to, and a max depth to traverse
+
+# too many arguments 
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ ../data/letters 10 99
+Too many arguments were given - pass a URL to begin with, a directory to save pages to, and a max depth to traverse
+
+# invalid URL
+./crawler http://cs50tse.cs.darts/index.html ../data/letters 10
+URL passed (first arg) is not internal
+
+# non-internal URL
+./crawler http://republicofletters.stanford.edu/ ../data/letters 5
+URL passed (first arg) is not internal
+
+# invalid directory
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ ../myletters 6
+page directory passed (second arg) could not be initialized
+
+# depth below range
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ ../data/letters -1
+max depth passed (third arg) was not within range of 0 to 10 (inclusive)
+
+# depth above range
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ ../data/letters 36
+max depth passed (third arg) was not within range of 0 to 10 (inclusive)
+
+# crawler on small example, small depth
+./crawler http://cs50tse.cs.dartmouth.edu/tse/toscrape/ ../data/scrape 1
+arguments checked
+
+-- end --
+
+
+# crawler on small example, max depth, with valgrind
+valgrind --leak-check=full --show-leak-kinds=all ./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ ../data/letters 10
+==3489131== Memcheck, a memory error detector
+==3489131== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==3489131== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==3489131== Command: ./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ ../data/letters 10
+==3489131== 
+arguments checked
+
+-- end --
+
+==3489131== 
+==3489131== HEAP SUMMARY:
+==3489131==     in use at exit: 0 bytes in 0 blocks
+==3489131==   total heap usage: 1,668 allocs, 1,668 frees, 348,648 bytes allocated
+==3489131== 
+==3489131== All heap blocks were freed -- no leaks are possible
+==3489131== 
+==3489131== For lists of detected and suppressed errors, rerun with: -s
+==3489131== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+# crawler on large example, small depth
+./crawler http://cs50tse.cs.dartmouth.edu/tse/wikipedia/ ../data/wiki 0
+arguments checked
+
+-- end --
+
+
+# large example, large depth is omitted for space
